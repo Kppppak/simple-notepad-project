@@ -1,4 +1,5 @@
 #include "main_window.h"
+#include "text_transform.h"
 
 #include <QMenuBar>
 #include <QFileDialog>
@@ -16,7 +17,23 @@ main_window::main_window()
 
     QMenu *file_menu =
         menuBar()->addMenu("File");
+    QMenu *transform_menu =
+        menuBar()->addMenu("Transform");
 
+    QAction *upper_action =
+        transform_menu->addAction(
+            "UPPERCASE"
+        );
+
+    QAction *lower_action =
+        transform_menu->addAction(
+            "lowercase"
+        );
+
+    QAction *capitalize_action =
+        transform_menu->addAction(
+            "Capitalize"
+        );
     QAction *open_action =
         file_menu->addAction("Open");
 
@@ -147,6 +164,51 @@ main_window::main_window()
             out << editor->toPlainText();
 
             file.close();
+        }
+    );
+
+    connect(
+        upper_action,
+        &QAction::triggered,
+        this,
+        [this]()
+        {
+            editor->setText(
+                text_transform::to_upper(
+                    editor->toPlainText()
+                )
+            );
+        }
+    );
+
+    // ================= LOWER =================
+
+    connect(
+        lower_action,
+        &QAction::triggered,
+        this,
+        [this]()
+        {
+            editor->setText(
+                text_transform::to_lower(
+                    editor->toPlainText()
+                )
+            );
+        }
+    );
+
+
+    connect(
+        capitalize_action,
+        &QAction::triggered,
+        this,
+        [this]()
+        {
+            editor->setText(
+                text_transform::capitalize(
+                    editor->toPlainText()
+                )
+            );
         }
     );
 }

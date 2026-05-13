@@ -6,6 +6,9 @@
 #include <QMessageBox>
 #include <QTextStream>
 #include <QFile>
+#include <QToolBar>
+#include <QTextCharFormat>
+#include <QFont>
 
 main_window::main_window()
 {
@@ -22,6 +25,16 @@ main_window::main_window()
     QMenu *edit_menu =
     menuBar()->addMenu("Edit");
 
+    QToolBar *toolbar =
+        addToolBar("Format");
+    QAction *bold_action =
+    toolbar->addAction("Bold");
+
+    QAction *italic_action =
+        toolbar->addAction("Italic");
+
+    QAction *underline_action =
+        toolbar->addAction("Underline");
     QAction *undo_action =
         edit_menu->addAction("Undo");
 
@@ -98,6 +111,23 @@ main_window::main_window()
         QKeySequence::SelectAll
     );
 
+    bold_action->setCheckable(true);
+
+    italic_action->setCheckable(true);
+
+    underline_action->setCheckable(true);
+
+    bold_action->setShortcut(
+    QKeySequence("Ctrl+B")
+);
+
+    italic_action->setShortcut(
+        QKeySequence("Ctrl+I")
+    );
+
+    underline_action->setShortcut(
+        QKeySequence("Ctrl+U")
+    );
 
     connect(
         open_action,
@@ -298,5 +328,62 @@ main_window::main_window()
         &QAction::triggered,
         editor,
         &QTextEdit::selectAll
+    );
+
+
+    connect(
+        bold_action,
+        &QAction::triggered,
+        this,
+        [this](bool checked)
+        {
+            QTextCharFormat format;
+
+            format.setFontWeight(
+                checked
+                    ? QFont::Bold
+                    : QFont::Normal
+            );
+
+            editor->mergeCurrentCharFormat(
+                format
+            );
+        }
+    );
+
+    connect(
+        italic_action,
+        &QAction::triggered,
+        this,
+        [this](bool checked)
+        {
+            QTextCharFormat format;
+
+            format.setFontItalic(
+                checked
+            );
+
+            editor->mergeCurrentCharFormat(
+                format
+            );
+        }
+    );
+
+    connect(
+        underline_action,
+        &QAction::triggered,
+        this,
+        [this](bool checked)
+        {
+            QTextCharFormat format;
+
+            format.setFontUnderline(
+                checked
+            );
+
+            editor->mergeCurrentCharFormat(
+                format
+            );
+        }
     );
 }

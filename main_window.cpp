@@ -10,8 +10,7 @@
 #include <QTextCharFormat>
 #include <QFont>
 
-main_window::main_window()
-{
+main_window::main_window() {
     setWindowTitle("Notepad");
     resize(800, 600);
 
@@ -19,66 +18,66 @@ main_window::main_window()
     setCentralWidget(editor);
 
     QMenu *file_menu =
-        menuBar()->addMenu("File");
+            menuBar()->addMenu("File");
     QMenu *transform_menu =
-        menuBar()->addMenu("Transform");
+            menuBar()->addMenu("Transform");
     QMenu *edit_menu =
-    menuBar()->addMenu("Edit");
+            menuBar()->addMenu("Edit");
 
     QToolBar *toolbar =
-        addToolBar("Format");
+            addToolBar("Format");
     QAction *bold_action =
-    toolbar->addAction("Bold");
+            toolbar->addAction("Bold");
 
     QAction *italic_action =
-        toolbar->addAction("Italic");
+            toolbar->addAction("Italic");
 
     QAction *underline_action =
-        toolbar->addAction("Underline");
+            toolbar->addAction("Underline");
     QAction *undo_action =
-        edit_menu->addAction("Undo");
+            edit_menu->addAction("Undo");
 
     QAction *redo_action =
-        edit_menu->addAction("Redo");
+            edit_menu->addAction("Redo");
 
     edit_menu->addSeparator();
 
     QAction *cut_action =
-        edit_menu->addAction("Cut");
+            edit_menu->addAction("Cut");
 
     QAction *copy_action =
-        edit_menu->addAction("Copy");
+            edit_menu->addAction("Copy");
 
     QAction *paste_action =
-        edit_menu->addAction("Paste");
+            edit_menu->addAction("Paste");
 
     edit_menu->addSeparator();
 
     QAction *select_all_action =
-        edit_menu->addAction("Select All");
+            edit_menu->addAction("Select All");
 
     QAction *upper_action =
-        transform_menu->addAction(
-            "UPPERCASE"
-        );
+            transform_menu->addAction(
+                "UPPERCASE"
+            );
 
     QAction *lower_action =
-        transform_menu->addAction(
-            "lowercase"
-        );
+            transform_menu->addAction(
+                "lowercase"
+            );
 
     QAction *capitalize_action =
-        transform_menu->addAction(
-            "Capitalize"
-        );
+            transform_menu->addAction(
+                "Capitalize"
+            );
     QAction *open_action =
-        file_menu->addAction("Open");
+            file_menu->addAction("Open");
 
     QAction *save_action =
-        file_menu->addAction("Save");
+            file_menu->addAction("Save");
 
     QAction *save_as_action =
-        file_menu->addAction("Save As");
+            file_menu->addAction("Save As");
 
     open_action->setShortcut(QKeySequence::Open);
 
@@ -88,8 +87,8 @@ main_window::main_window()
         QKeySequence::SaveAs
     );
     undo_action->setShortcut(
-    QKeySequence::Undo
-);
+        QKeySequence::Undo
+    );
 
     redo_action->setShortcut(
         QKeySequence::Redo
@@ -118,8 +117,8 @@ main_window::main_window()
     underline_action->setCheckable(true);
 
     bold_action->setShortcut(
-    QKeySequence("Ctrl+B")
-);
+        QKeySequence("Ctrl+B")
+    );
 
     italic_action->setShortcut(
         QKeySequence("Ctrl+I")
@@ -133,23 +132,20 @@ main_window::main_window()
         open_action,
         &QAction::triggered,
         this,
-        [this]()
-        {
+        [this]() {
             QString file_name =
-                QFileDialog::getOpenFileName(
-                    this,
-                    "Open File"
-                );
+                    QFileDialog::getOpenFileName(
+                        this,
+                        "Open File"
+                    );
 
-            if (file_name.isEmpty())
-            {
+            if (file_name.isEmpty()) {
                 return;
             }
 
             QFile file(file_name);
 
-            if (!file.open(QIODevice::ReadOnly))
-            {
+            if (!file.open(QIODevice::ReadOnly)) {
                 QMessageBox::critical(
                     this,
                     "Error",
@@ -172,23 +168,20 @@ main_window::main_window()
         save_action,
         &QAction::triggered,
         this,
-        [this]()
-        {
+        [this]() {
             QString file_name =
-                QFileDialog::getSaveFileName(
-                    this,
-                    "Save File"
-                );
+                    QFileDialog::getSaveFileName(
+                        this,
+                        "Save File"
+                    );
 
-            if (file_name.isEmpty())
-            {
+            if (file_name.isEmpty()) {
                 return;
             }
 
             QFile file(file_name);
 
-            if (!file.open(QIODevice::WriteOnly))
-            {
+            if (!file.open(QIODevice::WriteOnly)) {
                 QMessageBox::critical(
                     this,
                     "Error",
@@ -210,23 +203,20 @@ main_window::main_window()
         save_as_action,
         &QAction::triggered,
         this,
-        [this]()
-        {
+        [this]() {
             QString file_name =
-                QFileDialog::getSaveFileName(
-                    this,
-                    "Save As"
-                );
+                    QFileDialog::getSaveFileName(
+                        this,
+                        "Save As"
+                    );
 
-            if (file_name.isEmpty())
-            {
+            if (file_name.isEmpty()) {
                 return;
             }
 
             QFile file(file_name);
 
-            if (!file.open(QIODevice::WriteOnly))
-            {
+            if (!file.open(QIODevice::WriteOnly)) {
                 QMessageBox::critical(
                     this,
                     "Error",
@@ -248,8 +238,7 @@ main_window::main_window()
         upper_action,
         &QAction::triggered,
         this,
-        [this]()
-        {
+        [this]() {
             editor->setText(
                 text_transform::to_upper(
                     editor->toPlainText()
@@ -263,8 +252,7 @@ main_window::main_window()
         lower_action,
         &QAction::triggered,
         this,
-        [this]()
-        {
+        [this]() {
             editor->setText(
                 text_transform::to_lower(
                     editor->toPlainText()
@@ -278,8 +266,7 @@ main_window::main_window()
         capitalize_action,
         &QAction::triggered,
         this,
-        [this]()
-        {
+        [this]() {
             editor->setText(
                 text_transform::capitalize(
                     editor->toPlainText()
@@ -335,8 +322,7 @@ main_window::main_window()
         bold_action,
         &QAction::triggered,
         this,
-        [this](bool checked)
-        {
+        [this](bool checked) {
             QTextCharFormat format;
 
             format.setFontWeight(
@@ -355,8 +341,7 @@ main_window::main_window()
         italic_action,
         &QAction::triggered,
         this,
-        [this](bool checked)
-        {
+        [this](bool checked) {
             QTextCharFormat format;
 
             format.setFontItalic(
@@ -373,8 +358,7 @@ main_window::main_window()
         underline_action,
         &QAction::triggered,
         this,
-        [this](bool checked)
-        {
+        [this](bool checked) {
             QTextCharFormat format;
 
             format.setFontUnderline(

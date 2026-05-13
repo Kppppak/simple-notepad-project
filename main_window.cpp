@@ -19,6 +19,30 @@ main_window::main_window()
         menuBar()->addMenu("File");
     QMenu *transform_menu =
         menuBar()->addMenu("Transform");
+    QMenu *edit_menu =
+    menuBar()->addMenu("Edit");
+
+    QAction *undo_action =
+        edit_menu->addAction("Undo");
+
+    QAction *redo_action =
+        edit_menu->addAction("Redo");
+
+    edit_menu->addSeparator();
+
+    QAction *cut_action =
+        edit_menu->addAction("Cut");
+
+    QAction *copy_action =
+        edit_menu->addAction("Copy");
+
+    QAction *paste_action =
+        edit_menu->addAction("Paste");
+
+    edit_menu->addSeparator();
+
+    QAction *select_all_action =
+        edit_menu->addAction("Select All");
 
     QAction *upper_action =
         transform_menu->addAction(
@@ -49,6 +73,29 @@ main_window::main_window()
 
     save_as_action->setShortcut(
         QKeySequence::SaveAs
+    );
+    undo_action->setShortcut(
+    QKeySequence::Undo
+);
+
+    redo_action->setShortcut(
+        QKeySequence::Redo
+    );
+
+    cut_action->setShortcut(
+        QKeySequence::Cut
+    );
+
+    copy_action->setShortcut(
+        QKeySequence::Copy
+    );
+
+    paste_action->setShortcut(
+        QKeySequence::Paste
+    );
+
+    select_all_action->setShortcut(
+        QKeySequence::SelectAll
     );
 
 
@@ -181,7 +228,6 @@ main_window::main_window()
         }
     );
 
-    // ================= LOWER =================
 
     connect(
         lower_action,
@@ -210,5 +256,47 @@ main_window::main_window()
                 )
             );
         }
+    );
+
+    connect(
+        undo_action,
+        &QAction::triggered,
+        editor,
+        &QTextEdit::undo
+    );
+
+    connect(
+        redo_action,
+        &QAction::triggered,
+        editor,
+        &QTextEdit::redo
+    );
+
+    connect(
+        cut_action,
+        &QAction::triggered,
+        editor,
+        &QTextEdit::cut
+    );
+
+    connect(
+        copy_action,
+        &QAction::triggered,
+        editor,
+        &QTextEdit::copy
+    );
+
+    connect(
+        paste_action,
+        &QAction::triggered,
+        editor,
+        &QTextEdit::paste
+    );
+
+    connect(
+        select_all_action,
+        &QAction::triggered,
+        editor,
+        &QTextEdit::selectAll
     );
 }

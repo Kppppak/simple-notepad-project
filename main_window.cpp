@@ -11,6 +11,8 @@
 #include <QToolBar>
 #include <QTextCharFormat>
 #include <QFont>
+#include <QMenu>
+#include <QTextCursor>
 
 main_window::main_window(QWidget* parent)
     : QMainWindow(parent) {
@@ -19,6 +21,77 @@ main_window::main_window(QWidget* parent)
 
     editor = new QTextEdit(this);
     setCentralWidget(editor);
+    editor->setContextMenuPolicy(
+    Qt::CustomContextMenu
+);
+
+    connect(
+        editor,
+        &QTextEdit::customContextMenuRequested,
+        this,
+        [this](const QPoint& pos)
+        {
+            QTextCursor cursor =
+                editor->cursorForPosition(
+                    pos
+                );
+
+            cursor.select(
+                QTextCursor::WordUnderCursor
+            );
+
+            QString word =
+                cursor.selectedText();
+
+            QMenu* menu =
+                editor->createStandardContextMenu();
+
+            if (
+                !checker.is_correct(
+                    word
+                )
+            )
+            {
+                auto list =
+                    checker.suggestions(
+                        word
+                    );
+
+                menu->addSeparator();
+
+                for(
+                    const auto& suggestion
+                    : list
+                )
+                {
+                    QAction* action =
+                        menu->addAction(
+                            suggestion
+                        );
+
+                    connect(
+                        action,
+                        &QAction::triggered,
+                        this,
+                        [cursor,suggestion]() mutable
+                        {
+                            cursor.insertText(
+                                suggestion
+                            );
+                        }
+                    );
+                }
+            }
+
+            menu->exec(
+                editor->mapToGlobal(
+                    pos
+                )
+            );
+
+            delete menu;
+        }
+    );
 
     checker.load_words(
     "data/words.txt"

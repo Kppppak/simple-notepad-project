@@ -6,6 +6,7 @@
 #include <QTextStream>
 
 #include <set>
+#include <vector>
 #include <string>
 
 class spell_checker
@@ -14,25 +15,20 @@ private:
     std::set<std::string> words;
 
 public:
-    void load_words(
-        const QString& filename
-    )
+    void load_words(const QString& filename)
     {
         QFile file(filename);
 
-        if(
-            !file.open(
+        if (!file.open(
                 QIODevice::ReadOnly |
-                QIODevice::Text
-            )
-        )
+                QIODevice::Text))
         {
             return;
         }
 
         QTextStream in(&file);
 
-        while(!in.atEnd())
+        while (!in.atEnd())
         {
             QString word =
                 in.readLine()
@@ -53,6 +49,42 @@ public:
             word.toLower()
                 .toStdString()
         );
+    }
+
+    std::vector<QString> suggestions(
+        const QString& word
+    ) const
+    {
+        std::vector<QString> result;
+
+        QString prefix =
+            word.left(2).toLower();
+
+        for (const auto& w : words)
+        {
+            QString current =
+                QString::fromStdString(w);
+
+            if (
+                current.startsWith(
+                    prefix
+                )
+            )
+            {
+                result.push_back(
+                    current
+                );
+            }
+
+            if (
+                result.size() == 5
+            )
+            {
+                break;
+            }
+        }
+
+        return result;
     }
 };
 

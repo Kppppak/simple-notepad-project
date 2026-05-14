@@ -36,6 +36,17 @@ main_window::main_window(QWidget* parent)
             menuBar()->addMenu("Transform");
     QMenu *edit_menu =
             menuBar()->addMenu("Edit");
+    QMenu *tools_menu =
+
+        menuBar()->addMenu("Tools");
+
+    QAction *check_spelling_action =
+
+            tools_menu->addAction(
+
+                "Check Spelling..."
+
+            );
 
     QToolBar *toolbar =
             addToolBar("Format");
@@ -175,7 +186,15 @@ main_window::main_window(QWidget* parent)
             file.close();
         }
     );
-
+    connect(
+        check_spelling_action,
+        &QAction::triggered,
+        this,
+        [this]()
+        {
+            highlighter->rehighlight();
+        }
+    );
 
     connect(
         save_action,

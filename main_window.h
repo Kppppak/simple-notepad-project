@@ -4,11 +4,17 @@
 #include <QTextEdit>
 #include <QString>
 
+#include "spell_checker.h"
+#include "spell_checker_highlighter.h"
+
 class main_window : public QMainWindow
 {
 private:
     QTextEdit* editor;
     QString current_file;
+
+    spell_checker checker;
+    spell_checker_highlighter* highlighter;
 
     void open_file();
     void save_file();
@@ -16,5 +22,5 @@ private:
     void update_title();
 
 public:
-    main_window();
+    explicit main_window(QWidget* parent = nullptr);
 };

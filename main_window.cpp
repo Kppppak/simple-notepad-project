@@ -1,5 +1,7 @@
 #include "main_window.h"
 #include "text_transform.h"
+#include "spell_checker.h"
+#include "spell_checker_highlighter.h"
 
 #include <QMenuBar>
 #include <QFileDialog>
@@ -10,12 +12,23 @@
 #include <QTextCharFormat>
 #include <QFont>
 
-main_window::main_window() {
+main_window::main_window(QWidget* parent)
+    : QMainWindow(parent) {
     setWindowTitle("Notepad");
     resize(800, 600);
 
     editor = new QTextEdit(this);
     setCentralWidget(editor);
+
+    checker.load_words(
+    "data/words.txt"
+);
+
+    highlighter =
+        new spell_checker_highlighter(
+            editor->document(),
+            checker
+        );
 
     QMenu *file_menu =
             menuBar()->addMenu("File");

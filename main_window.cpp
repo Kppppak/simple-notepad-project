@@ -14,7 +14,7 @@
 #include <QMenu>
 #include <QTextCursor>
 
-main_window::main_window(QWidget* parent)
+main_window::main_window(QWidget *parent)
     : QMainWindow(parent) {
     setWindowTitle("Notepad");
     resize(800, 600);
@@ -22,59 +22,55 @@ main_window::main_window(QWidget* parent)
     editor = new QTextEdit(this);
     setCentralWidget(editor);
     editor->setContextMenuPolicy(
-    Qt::CustomContextMenu
-);
+        Qt::CustomContextMenu
+    );
 
     connect(
         editor,
         &QTextEdit::customContextMenuRequested,
         this,
-        [this](const QPoint& pos)
-        {
+        [this](const QPoint &pos) {
             QTextCursor cursor =
-                editor->cursorForPosition(
-                    pos
-                );
+                    editor->cursorForPosition(
+                        pos
+                    );
 
             cursor.select(
                 QTextCursor::WordUnderCursor
             );
 
             QString word =
-                cursor.selectedText();
+                    cursor.selectedText();
 
-            QMenu* menu =
-                editor->createStandardContextMenu();
+            QMenu *menu =
+                    editor->createStandardContextMenu();
 
             if (
                 !checker.is_correct(
                     word
                 )
-            )
-            {
+            ) {
                 auto list =
-                    checker.suggestions(
-                        word
-                    );
+                        checker.suggestions(
+                            word
+                        );
 
                 menu->addSeparator();
 
-                for(
-                    const auto& suggestion
+                for (
+                    const auto &suggestion
                     : list
-                )
-                {
-                    QAction* action =
-                        menu->addAction(
-                            suggestion
-                        );
+                ) {
+                    QAction *action =
+                            menu->addAction(
+                                suggestion
+                            );
 
                     connect(
                         action,
                         &QAction::triggered,
                         this,
-                        [cursor,suggestion]() mutable
-                        {
+                        [cursor,suggestion]() mutable {
                             cursor.insertText(
                                 suggestion
                             );
@@ -94,14 +90,14 @@ main_window::main_window(QWidget* parent)
     );
 
     checker.load_words(
-    "data/words.txt"
-);
+        "data/words.txt"
+    );
 
     highlighter =
-        new spell_checker_highlighter(
-            editor->document(),
-            checker
-        );
+            new spell_checker_highlighter(
+                editor->document(),
+                checker
+            );
 
     QMenu *file_menu =
             menuBar()->addMenu("File");
@@ -109,9 +105,29 @@ main_window::main_window(QWidget* parent)
             menuBar()->addMenu("Transform");
     QMenu *edit_menu =
             menuBar()->addMenu("Edit");
+    QMenu *view_menu =
+            menuBar()->addMenu("View");
+
+    QAction *zoom_in_action =
+            view_menu->addAction(
+                "Zoom In"
+            );
+
+    QAction *zoom_out_action =
+            view_menu->addAction(
+                "Zoom Out"
+            );
+
+    zoom_in_action->setShortcut(
+        QKeySequence("Ctrl++")
+    );
+
+    zoom_out_action->setShortcut(
+        QKeySequence("Ctrl+-")
+    );
     QMenu *tools_menu =
 
-        menuBar()->addMenu("Tools");
+            menuBar()->addMenu("Tools");
 
     QAction *check_spelling_action =
 
@@ -263,8 +279,7 @@ main_window::main_window(QWidget* parent)
         check_spelling_action,
         &QAction::triggered,
         this,
-        [this]()
-        {
+        [this]() {
             highlighter->rehighlight();
         }
     );
@@ -352,7 +367,23 @@ main_window::main_window(QWidget* parent)
         }
     );
 
+    connect(
+        zoom_in_action,
+        &QAction::triggered,
+        this,
+        [this]() {
+            editor->zoomIn(1);
+        }
+    );
 
+    connect(
+        zoom_out_action,
+        &QAction::triggered,
+        this,
+        [this]() {
+            editor->zoomOut(1);
+        }
+    );
     connect(
         lower_action,
         &QAction::triggered,

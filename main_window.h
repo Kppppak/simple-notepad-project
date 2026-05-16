@@ -33,6 +33,8 @@ private:
 
     void replace_all();
 
+    void show_word_frequency();
+
     QDialog *find_dialog;
     QLineEdit *find_input;
     QLineEdit *replace_input;

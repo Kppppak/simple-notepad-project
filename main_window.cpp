@@ -2,6 +2,7 @@
 #include "text_transform.h"
 #include "spell_checker.h"
 #include "spell_checker_highlighter.h"
+#include "word_frequency_dialog.h"
 
 #include <QMenuBar>
 #include <QFileDialog>
@@ -17,6 +18,11 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QDialog>
+#include <QTableWidgetItem>
+#include <QHeaderView>
+
+#include <map>
+#include <sstream>
 
 main_window::main_window(QWidget *parent)
     : QMainWindow(parent) {
@@ -193,6 +199,11 @@ main_window::main_window(QWidget *parent)
 
     QAction *underline_action =
             toolbar->addAction("Underline");
+
+    QAction *word_frequency_action =
+    tools_menu->addAction(
+        "Word Frequency"
+    );
 
     open_action->setShortcut(
         QKeySequence::Open
@@ -548,6 +559,15 @@ main_window::main_window(QWidget *parent)
             show_find_dialog();
         }
     );
+    connect(
+    word_frequency_action,
+    &QAction::triggered,
+    this,
+    [this]()
+    {
+        show_word_frequency();
+    }
+);
 }
 
 void main_window::show_find_dialog() {
@@ -713,4 +733,30 @@ void main_window::replace_all() {
     }
 
     cursor.endEditBlock();
+}
+void main_window::show_word_frequency()
+{
+    QString text =
+        editor->toPlainText().toLower();
+
+    std::stringstream stream(
+        text.toStdString()
+    );
+
+    std::map<std::string, int> freq;
+
+    std::string word;
+
+    while (stream >> word)
+    {
+        ++freq[word];
+    }
+
+    auto* dialog =
+        new word_frequency_dialog(
+            freq,
+            this
+        );
+
+    dialog->exec();
 }

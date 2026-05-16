@@ -3,6 +3,8 @@
 #include <QMainWindow>
 #include <QTextEdit>
 #include <QString>
+#include <QDialog>
+#include <QLineEdit>
 
 #include "spell_checker.h"
 #include "spell_checker_highlighter.h"
@@ -20,6 +22,11 @@ private:
     void save_file();
     void save_file_as();
     void update_title();
+    void show_find_dialog();
+    void find_next();
+
+    QDialog* find_dialog;
+    QLineEdit* find_input;
 
 public:
     explicit main_window(QWidget* parent = nullptr);

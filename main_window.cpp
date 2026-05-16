@@ -13,6 +13,10 @@
 #include <QFont>
 #include <QMenu>
 #include <QTextCursor>
+#include <QVBoxLayout>
+#include <QPushButton>
+#include <QLineEdit>
+#include <QDialog>
 
 main_window::main_window(QWidget *parent)
     : QMainWindow(parent) {
@@ -129,6 +133,10 @@ main_window::main_window(QWidget *parent)
 
             menuBar()->addMenu("Tools");
 
+    QMenu *search_menu =
+            menuBar()->addMenu("Search");
+
+
     QAction *check_spelling_action =
 
             tools_menu->addAction(
@@ -192,6 +200,10 @@ main_window::main_window(QWidget *parent)
     QAction *save_as_action =
             file_menu->addAction("Save As");
 
+    QAction *find_action =
+        search_menu->addAction("Find");
+
+
     open_action->setShortcut(QKeySequence::Open);
 
     save_action->setShortcut(QKeySequence::Save);
@@ -222,6 +234,7 @@ main_window::main_window(QWidget *parent)
     select_all_action->setShortcut(
         QKeySequence::SelectAll
     );
+
 
     bold_action->setCheckable(true);
 
@@ -397,7 +410,6 @@ main_window::main_window(QWidget *parent)
         }
     );
 
-
     connect(
         capitalize_action,
         &QAction::triggered,
@@ -506,4 +518,77 @@ main_window::main_window(QWidget *parent)
             );
         }
     );
+    connect(
+    find_action,
+    &QAction::triggered,
+    this,
+    [this]() {
+        show_find_dialog();
+    }
+);
+
+
+}
+ void main_window::show_find_dialog()
+{
+    find_dialog = new QDialog(this);
+
+    find_dialog->setWindowTitle(
+        "Find"
+    );
+
+    auto* layout =
+            new QVBoxLayout(find_dialog);
+
+    find_input =
+            new QLineEdit(find_dialog);
+
+    auto* button =
+            new QPushButton(
+                "Find Next",
+                find_dialog
+            );
+
+    layout->addWidget(find_input);
+    layout->addWidget(button);
+
+    connect(
+        button,
+        &QPushButton::clicked,
+        this,
+        [this]() {
+            find_next();
+        }
+    );
+
+    find_dialog->show();
+}
+
+void main_window::find_next()
+{
+    QString text =
+            find_input->text();
+
+    if (text.isEmpty()) {
+        return;
+    }
+
+    bool found =
+            editor->find(text);
+
+    if (!found) {
+
+        QTextCursor cursor =
+                editor->textCursor();
+
+        cursor.movePosition(
+            QTextCursor::Start
+        );
+
+        editor->setTextCursor(
+            cursor
+        );
+
+        editor->find(text);
+    }
 }

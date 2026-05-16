@@ -20,6 +20,7 @@
 #include <QDialog>
 #include <QTableWidgetItem>
 #include <QHeaderView>
+#include <QStatusBar>
 
 #include <map>
 #include <sstream>
@@ -33,6 +34,10 @@ main_window::main_window(QWidget *parent)
     editor = new QTextEdit(this);
 
     setCentralWidget(editor);
+
+    statusBar()->showMessage(
+    "Line: 1   Column: 1"
+);
 
     editor->setContextMenuPolicy(
         Qt::CustomContextMenu
@@ -488,7 +493,15 @@ main_window::main_window(QWidget *parent)
             editor->zoomOut(1);
         }
     );
-
+    connect(
+    editor,
+    &QTextEdit::cursorPositionChanged,
+    this,
+    [this]()
+    {
+        update_status();
+    }
+);
     connect(
         check_spelling_action,
         &QAction::triggered,
@@ -759,4 +772,24 @@ void main_window::show_word_frequency()
         );
 
     dialog->exec();
+}
+
+void main_window::update_status()
+{
+    QTextCursor cursor =
+        editor->textCursor();
+
+    int line =
+        cursor.blockNumber() + 1;
+
+    int column =
+        cursor.columnNumber() + 1;
+
+    statusBar()->showMessage(
+        QString(
+            "Line: %1   Column: %2"
+        )
+        .arg(line)
+        .arg(column)
+    );
 }

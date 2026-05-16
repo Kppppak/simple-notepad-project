@@ -24,9 +24,13 @@ private:
     void update_title();
     void show_find_dialog();
     void find_next();
+void replace_text();
 
     QDialog* find_dialog;
     QLineEdit* find_input;
+    QLineEdit* replace_input;
+
+
 
 public:
     explicit main_window(QWidget* parent = nullptr);

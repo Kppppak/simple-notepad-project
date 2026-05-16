@@ -19,62 +19,74 @@
 #include <QDialog>
 
 main_window::main_window(QWidget *parent)
-    : QMainWindow(parent) {
+    : QMainWindow(parent)
+{
     setWindowTitle("Notepad");
+
     resize(800, 600);
 
     editor = new QTextEdit(this);
+
     setCentralWidget(editor);
+
     editor->setContextMenuPolicy(
         Qt::CustomContextMenu
     );
+
+    checker.load_words(
+        "data/words.txt"
+    );
+
+    highlighter =
+        new spell_checker_highlighter(
+            editor->document(),
+            checker
+        );
 
     connect(
         editor,
         &QTextEdit::customContextMenuRequested,
         this,
-        [this](const QPoint &pos) {
+        [this](const QPoint &pos)
+        {
             QTextCursor cursor =
-                    editor->cursorForPosition(
-                        pos
-                    );
+                editor->cursorForPosition(pos);
 
             cursor.select(
                 QTextCursor::WordUnderCursor
             );
 
             QString word =
-                    cursor.selectedText();
+                cursor.selectedText();
 
             QMenu *menu =
-                    editor->createStandardContextMenu();
+                editor->createStandardContextMenu();
 
             if (
-                !checker.is_correct(
-                    word
-                )
-            ) {
+                !checker.is_correct(word)
+            )
+            {
                 auto list =
-                        checker.suggestions(
-                            word
-                        );
+                    checker.suggestions(word);
 
                 menu->addSeparator();
 
                 for (
                     const auto &suggestion
                     : list
-                ) {
+                )
+                {
                     QAction *action =
-                            menu->addAction(
-                                suggestion
-                            );
+                        menu->addAction(
+                            suggestion
+                        );
 
                     connect(
                         action,
                         &QAction::triggered,
                         this,
-                        [cursor,suggestion]() mutable {
+                        [cursor, suggestion]() mutable
+                        {
                             cursor.insertText(
                                 suggestion
                             );
@@ -84,133 +96,121 @@ main_window::main_window(QWidget *parent)
             }
 
             menu->exec(
-                editor->mapToGlobal(
-                    pos
-                )
+                editor->mapToGlobal(pos)
             );
 
             delete menu;
         }
     );
 
-    checker.load_words(
-        "data/words.txt"
-    );
-
-    highlighter =
-            new spell_checker_highlighter(
-                editor->document(),
-                checker
-            );
-
     QMenu *file_menu =
-            menuBar()->addMenu("File");
-    QMenu *transform_menu =
-            menuBar()->addMenu("Transform");
+        menuBar()->addMenu("File");
+
     QMenu *edit_menu =
-            menuBar()->addMenu("Edit");
+        menuBar()->addMenu("Edit");
+
+    QMenu *transform_menu =
+        menuBar()->addMenu("Transform");
+
     QMenu *view_menu =
-            menuBar()->addMenu("View");
+        menuBar()->addMenu("View");
 
-    QAction *zoom_in_action =
-            view_menu->addAction(
-                "Zoom In"
-            );
-
-    QAction *zoom_out_action =
-            view_menu->addAction(
-                "Zoom Out"
-            );
-
-    zoom_in_action->setShortcut(
-        QKeySequence("Ctrl++")
-    );
-
-    zoom_out_action->setShortcut(
-        QKeySequence("Ctrl+-")
-    );
     QMenu *tools_menu =
-
-            menuBar()->addMenu("Tools");
+        menuBar()->addMenu("Tools");
 
     QMenu *search_menu =
-            menuBar()->addMenu("Search");
+        menuBar()->addMenu("Search");
 
+    QAction *open_action =
+        file_menu->addAction("Open");
 
-    QAction *check_spelling_action =
+    QAction *save_action =
+        file_menu->addAction("Save");
 
-            tools_menu->addAction(
+    QAction *save_as_action =
+        file_menu->addAction("Save As");
 
-                "Check Spelling..."
-
-            );
-
-    QToolBar *toolbar =
-            addToolBar("Format");
-    QAction *bold_action =
-            toolbar->addAction("Bold");
-
-    QAction *italic_action =
-            toolbar->addAction("Italic");
-
-    QAction *underline_action =
-            toolbar->addAction("Underline");
     QAction *undo_action =
-            edit_menu->addAction("Undo");
+        edit_menu->addAction("Undo");
 
     QAction *redo_action =
-            edit_menu->addAction("Redo");
+        edit_menu->addAction("Redo");
 
     edit_menu->addSeparator();
 
     QAction *cut_action =
-            edit_menu->addAction("Cut");
+        edit_menu->addAction("Cut");
 
     QAction *copy_action =
-            edit_menu->addAction("Copy");
+        edit_menu->addAction("Copy");
 
     QAction *paste_action =
-            edit_menu->addAction("Paste");
+        edit_menu->addAction("Paste");
 
     edit_menu->addSeparator();
 
     QAction *select_all_action =
-            edit_menu->addAction("Select All");
+        edit_menu->addAction("Select All");
 
     QAction *upper_action =
-            transform_menu->addAction(
-                "UPPERCASE"
-            );
+        transform_menu->addAction(
+            "UPPERCASE"
+        );
 
     QAction *lower_action =
-            transform_menu->addAction(
-                "lowercase"
-            );
+        transform_menu->addAction(
+            "lowercase"
+        );
 
     QAction *capitalize_action =
-            transform_menu->addAction(
-                "Capitalize"
-            );
-    QAction *open_action =
-            file_menu->addAction("Open");
+        transform_menu->addAction(
+            "Capitalize"
+        );
 
-    QAction *save_action =
-            file_menu->addAction("Save");
+    QAction *zoom_in_action =
+        view_menu->addAction(
+            "Zoom In"
+        );
 
-    QAction *save_as_action =
-            file_menu->addAction("Save As");
+    QAction *zoom_out_action =
+        view_menu->addAction(
+            "Zoom Out"
+        );
+
+    QAction *check_spelling_action =
+        tools_menu->addAction(
+            "Check Spelling..."
+        );
 
     QAction *find_action =
-        search_menu->addAction("Find");
+        search_menu->addAction(
+            "Find"
+        );
 
+    QToolBar *toolbar =
+        addToolBar("Format");
 
-    open_action->setShortcut(QKeySequence::Open);
+    QAction *bold_action =
+        toolbar->addAction("Bold");
 
-    save_action->setShortcut(QKeySequence::Save);
+    QAction *italic_action =
+        toolbar->addAction("Italic");
+
+    QAction *underline_action =
+        toolbar->addAction("Underline");
+
+    open_action->setShortcut(
+        QKeySequence::Open
+    );
+
+    save_action->setShortcut(
+        QKeySequence::Save
+    );
 
     save_as_action->setShortcut(
         QKeySequence::SaveAs
     );
+
     undo_action->setShortcut(
         QKeySequence::Undo
     );
@@ -235,6 +235,17 @@ main_window::main_window(QWidget *parent)
         QKeySequence::SelectAll
     );
 
+    find_action->setShortcut(
+        QKeySequence::Find
+    );
+
+    zoom_in_action->setShortcut(
+        QKeySequence("Ctrl++")
+    );
+
+    zoom_out_action->setShortcut(
+        QKeySequence("Ctrl+-")
+    );
 
     bold_action->setCheckable(true);
 
@@ -258,12 +269,13 @@ main_window::main_window(QWidget *parent)
         open_action,
         &QAction::triggered,
         this,
-        [this]() {
+        [this]()
+        {
             QString file_name =
-                    QFileDialog::getOpenFileName(
-                        this,
-                        "Open File"
-                    );
+                QFileDialog::getOpenFileName(
+                    this,
+                    "Open File"
+                );
 
             if (file_name.isEmpty()) {
                 return;
@@ -271,7 +283,12 @@ main_window::main_window(QWidget *parent)
 
             QFile file(file_name);
 
-            if (!file.open(QIODevice::ReadOnly)) {
+            if (
+                !file.open(
+                    QIODevice::ReadOnly
+                )
+            )
+            {
                 QMessageBox::critical(
                     this,
                     "Error",
@@ -283,17 +300,11 @@ main_window::main_window(QWidget *parent)
 
             QTextStream in(&file);
 
-            editor->setText(in.readAll());
+            editor->setText(
+                in.readAll()
+            );
 
             file.close();
-        }
-    );
-    connect(
-        check_spelling_action,
-        &QAction::triggered,
-        this,
-        [this]() {
-            highlighter->rehighlight();
         }
     );
 
@@ -301,12 +312,13 @@ main_window::main_window(QWidget *parent)
         save_action,
         &QAction::triggered,
         this,
-        [this]() {
+        [this]()
+        {
             QString file_name =
-                    QFileDialog::getSaveFileName(
-                        this,
-                        "Save File"
-                    );
+                QFileDialog::getSaveFileName(
+                    this,
+                    "Save File"
+                );
 
             if (file_name.isEmpty()) {
                 return;
@@ -314,7 +326,12 @@ main_window::main_window(QWidget *parent)
 
             QFile file(file_name);
 
-            if (!file.open(QIODevice::WriteOnly)) {
+            if (
+                !file.open(
+                    QIODevice::WriteOnly
+                )
+            )
+            {
                 QMessageBox::critical(
                     this,
                     "Error",
@@ -336,12 +353,13 @@ main_window::main_window(QWidget *parent)
         save_as_action,
         &QAction::triggered,
         this,
-        [this]() {
+        [this]()
+        {
             QString file_name =
-                    QFileDialog::getSaveFileName(
-                        this,
-                        "Save As"
-                    );
+                QFileDialog::getSaveFileName(
+                    this,
+                    "Save As"
+                );
 
             if (file_name.isEmpty()) {
                 return;
@@ -349,7 +367,12 @@ main_window::main_window(QWidget *parent)
 
             QFile file(file_name);
 
-            if (!file.open(QIODevice::WriteOnly)) {
+            if (
+                !file.open(
+                    QIODevice::WriteOnly
+                )
+            )
+            {
                 QMessageBox::critical(
                     this,
                     "Error",
@@ -371,7 +394,8 @@ main_window::main_window(QWidget *parent)
         upper_action,
         &QAction::triggered,
         this,
-        [this]() {
+        [this]()
+        {
             editor->setText(
                 text_transform::to_upper(
                     editor->toPlainText()
@@ -381,27 +405,11 @@ main_window::main_window(QWidget *parent)
     );
 
     connect(
-        zoom_in_action,
-        &QAction::triggered,
-        this,
-        [this]() {
-            editor->zoomIn(1);
-        }
-    );
-
-    connect(
-        zoom_out_action,
-        &QAction::triggered,
-        this,
-        [this]() {
-            editor->zoomOut(1);
-        }
-    );
-    connect(
         lower_action,
         &QAction::triggered,
         this,
-        [this]() {
+        [this]()
+        {
             editor->setText(
                 text_transform::to_lower(
                     editor->toPlainText()
@@ -414,7 +422,8 @@ main_window::main_window(QWidget *parent)
         capitalize_action,
         &QAction::triggered,
         this,
-        [this]() {
+        [this]()
+        {
             editor->setText(
                 text_transform::capitalize(
                     editor->toPlainText()
@@ -465,12 +474,42 @@ main_window::main_window(QWidget *parent)
         &QTextEdit::selectAll
     );
 
+    connect(
+        zoom_in_action,
+        &QAction::triggered,
+        this,
+        [this]()
+        {
+            editor->zoomIn(1);
+        }
+    );
+
+    connect(
+        zoom_out_action,
+        &QAction::triggered,
+        this,
+        [this]()
+        {
+            editor->zoomOut(1);
+        }
+    );
+
+    connect(
+        check_spelling_action,
+        &QAction::triggered,
+        this,
+        [this]()
+        {
+            highlighter->rehighlight();
+        }
+    );
 
     connect(
         bold_action,
         &QAction::triggered,
         this,
-        [this](bool checked) {
+        [this](bool checked)
+        {
             QTextCharFormat format;
 
             format.setFontWeight(
@@ -489,7 +528,8 @@ main_window::main_window(QWidget *parent)
         italic_action,
         &QAction::triggered,
         this,
-        [this](bool checked) {
+        [this](bool checked)
+        {
             QTextCharFormat format;
 
             format.setFontItalic(
@@ -506,7 +546,8 @@ main_window::main_window(QWidget *parent)
         underline_action,
         &QAction::triggered,
         this,
-        [this](bool checked) {
+        [this](bool checked)
+        {
             QTextCharFormat format;
 
             format.setFontUnderline(
@@ -518,46 +559,87 @@ main_window::main_window(QWidget *parent)
             );
         }
     );
+
     connect(
-    find_action,
-    &QAction::triggered,
-    this,
-    [this]() {
-        show_find_dialog();
-    }
-);
-
-
+        find_action,
+        &QAction::triggered,
+        this,
+        [this]()
+        {
+            show_find_dialog();
+        }
+    );
 }
- void main_window::show_find_dialog()
+
+void main_window::show_find_dialog()
 {
-    find_dialog = new QDialog(this);
+    find_dialog =
+        new QDialog(this);
 
     find_dialog->setWindowTitle(
         "Find"
     );
 
     auto* layout =
-            new QVBoxLayout(find_dialog);
+        new QVBoxLayout(
+            find_dialog
+        );
 
     find_input =
-            new QLineEdit(find_dialog);
+        new QLineEdit(
+            find_dialog
+        );
 
-    auto* button =
-            new QPushButton(
-                "Find Next",
-                find_dialog
-            );
+    replace_input =
+        new QLineEdit(
+            find_dialog
+        );
 
-    layout->addWidget(find_input);
-    layout->addWidget(button);
+    auto* find_button =
+        new QPushButton(
+            "Find Next",
+            find_dialog
+        );
+
+    auto* replace_button =
+        new QPushButton(
+            "Replace",
+            find_dialog
+        );
+
+    layout->addWidget(
+        find_input
+    );
+
+    layout->addWidget(
+        replace_input
+    );
+
+    layout->addWidget(
+        find_button
+    );
+
+    layout->addWidget(
+        replace_button
+    );
 
     connect(
-        button,
+        find_button,
         &QPushButton::clicked,
         this,
-        [this]() {
+        [this]()
+        {
             find_next();
+        }
+    );
+
+    connect(
+        replace_button,
+        &QPushButton::clicked,
+        this,
+        [this]()
+        {
+            replace_text();
         }
     );
 
@@ -567,19 +649,19 @@ main_window::main_window(QWidget *parent)
 void main_window::find_next()
 {
     QString text =
-            find_input->text();
+        find_input->text();
 
     if (text.isEmpty()) {
         return;
     }
 
     bool found =
-            editor->find(text);
+        editor->find(text);
 
-    if (!found) {
-
+    if (!found)
+    {
         QTextCursor cursor =
-                editor->textCursor();
+            editor->textCursor();
 
         cursor.movePosition(
             QTextCursor::Start
@@ -591,4 +673,19 @@ void main_window::find_next()
 
         editor->find(text);
     }
+}
+
+void main_window::replace_text()
+{
+    QTextCursor cursor =
+        editor->textCursor();
+
+    if (cursor.hasSelection())
+    {
+        cursor.insertText(
+            replace_input->text()
+        );
+    }
+
+    find_next();
 }

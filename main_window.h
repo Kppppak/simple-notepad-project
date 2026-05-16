@@ -37,6 +37,8 @@ private:
 
     void update_status();
 
+
+
     QDialog *find_dialog;
     QLineEdit *find_input;
     QLineEdit *replace_input;

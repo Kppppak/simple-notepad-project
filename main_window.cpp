@@ -18,9 +18,8 @@
 #include <QPushButton>
 #include <QLineEdit>
 #include <QDialog>
-#include <QTableWidgetItem>
-#include <QHeaderView>
 #include <QStatusBar>
+#include <QFontDialog>
 
 #include <map>
 #include <sstream>
@@ -121,6 +120,9 @@ main_window::main_window(QWidget *parent)
     QMenu *view_menu =
             menuBar()->addMenu("View");
 
+    QMenu *format_menu =
+    menuBar()->addMenu("Format");
+
     QMenu *tools_menu =
             menuBar()->addMenu("Tools");
 
@@ -182,6 +184,10 @@ main_window::main_window(QWidget *parent)
             view_menu->addAction(
                 "Zoom Out"
             );
+    QAction *font_action =
+    format_menu->addAction(
+        "Font..."
+    );
 
     QAction *check_spelling_action =
             tools_menu->addAction(
@@ -581,6 +587,28 @@ main_window::main_window(QWidget *parent)
         show_word_frequency();
     }
 );
+
+    connect(
+        font_action,
+        &QAction::triggered,
+        this,
+        [this](bool)
+        {
+            bool ok = false;
+
+            QFont font =
+                QFontDialog::getFont(
+                    &ok,
+                    editor->font(),
+                    this
+                );
+
+            if (ok)
+            {
+                editor->setFont(font);
+            }
+        }
+    );
 }
 
 void main_window::show_find_dialog() {

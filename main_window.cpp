@@ -3,6 +3,7 @@
 #include "spell_checker.h"
 #include "spell_checker_highlighter.h"
 #include "word_frequency_dialog.h"
+#include "notepad_exception.h"
 
 #include <QMenuBar>
 #include <QFileDialog>
@@ -35,8 +36,8 @@ main_window::main_window(QWidget *parent)
     setCentralWidget(editor);
 
     statusBar()->showMessage(
-    "Line: 1   Column: 1"
-);
+        "Line: 1   Column: 1"
+    );
 
     editor->setContextMenuPolicy(
         Qt::CustomContextMenu
@@ -121,7 +122,7 @@ main_window::main_window(QWidget *parent)
             menuBar()->addMenu("View");
 
     QMenu *format_menu =
-    menuBar()->addMenu("Format");
+            menuBar()->addMenu("Format");
 
     QMenu *tools_menu =
             menuBar()->addMenu("Tools");
@@ -185,9 +186,9 @@ main_window::main_window(QWidget *parent)
                 "Zoom Out"
             );
     QAction *font_action =
-    format_menu->addAction(
-        "Font..."
-    );
+            format_menu->addAction(
+                "Font..."
+            );
 
     QAction *check_spelling_action =
             tools_menu->addAction(
@@ -212,9 +213,9 @@ main_window::main_window(QWidget *parent)
             toolbar->addAction("Underline");
 
     QAction *word_frequency_action =
-    tools_menu->addAction(
-        "Word Frequency"
-    );
+            tools_menu->addAction(
+                "Word Frequency"
+            );
 
     open_action->setShortcut(
         QKeySequence::Open
@@ -287,39 +288,7 @@ main_window::main_window(QWidget *parent)
         &QAction::triggered,
         this,
         [this]() {
-            QString file_name =
-                    QFileDialog::getOpenFileName(
-                        this,
-                        "Open File"
-                    );
-
-            if (file_name.isEmpty()) {
-                return;
-            }
-
-            QFile file(file_name);
-
-            if (
-                !file.open(
-                    QIODevice::ReadOnly
-                )
-            ) {
-                QMessageBox::critical(
-                    this,
-                    "Error",
-                    "Cannot open file"
-                );
-
-                return;
-            }
-
-            QTextStream in(&file);
-
-            editor->setText(
-                in.readAll()
-            );
-
-            file.close();
+            open_file();
         }
     );
 
@@ -328,37 +297,7 @@ main_window::main_window(QWidget *parent)
         &QAction::triggered,
         this,
         [this]() {
-            QString file_name =
-                    QFileDialog::getSaveFileName(
-                        this,
-                        "Save File"
-                    );
-
-            if (file_name.isEmpty()) {
-                return;
-            }
-
-            QFile file(file_name);
-
-            if (
-                !file.open(
-                    QIODevice::WriteOnly
-                )
-            ) {
-                QMessageBox::critical(
-                    this,
-                    "Error",
-                    "Cannot save file"
-                );
-
-                return;
-            }
-
-            QTextStream out(&file);
-
-            out << editor->toPlainText();
-
-            file.close();
+            save_file();
         }
     );
 
@@ -367,37 +306,7 @@ main_window::main_window(QWidget *parent)
         &QAction::triggered,
         this,
         [this]() {
-            QString file_name =
-                    QFileDialog::getSaveFileName(
-                        this,
-                        "Save As"
-                    );
-
-            if (file_name.isEmpty()) {
-                return;
-            }
-
-            QFile file(file_name);
-
-            if (
-                !file.open(
-                    QIODevice::WriteOnly
-                )
-            ) {
-                QMessageBox::critical(
-                    this,
-                    "Error",
-                    "Cannot save file"
-                );
-
-                return;
-            }
-
-            QTextStream out(&file);
-
-            out << editor->toPlainText();
-
-            file.close();
+            save_file_as();
         }
     );
 
@@ -500,14 +409,13 @@ main_window::main_window(QWidget *parent)
         }
     );
     connect(
-    editor,
-    &QTextEdit::cursorPositionChanged,
-    this,
-    [this]()
-    {
-        update_status();
-    }
-);
+        editor,
+        &QTextEdit::cursorPositionChanged,
+        this,
+        [this]() {
+            update_status();
+        }
+    );
     connect(
         check_spelling_action,
         &QAction::triggered,
@@ -579,32 +487,29 @@ main_window::main_window(QWidget *parent)
         }
     );
     connect(
-    word_frequency_action,
-    &QAction::triggered,
-    this,
-    [this]()
-    {
-        show_word_frequency();
-    }
-);
+        word_frequency_action,
+        &QAction::triggered,
+        this,
+        [this]() {
+            show_word_frequency();
+        }
+    );
 
     connect(
         font_action,
         &QAction::triggered,
         this,
-        [this](bool)
-        {
+        [this](bool) {
             bool ok = false;
 
             QFont font =
-                QFontDialog::getFont(
-                    &ok,
-                    editor->font(),
-                    this
-                );
+                    QFontDialog::getFont(
+                        &ok,
+                        editor->font(),
+                        this
+                    );
 
-            if (ok)
-            {
+            if (ok) {
                 editor->setFont(font);
             }
         }
@@ -775,10 +680,10 @@ void main_window::replace_all() {
 
     cursor.endEditBlock();
 }
-void main_window::show_word_frequency()
-{
+
+void main_window::show_word_frequency() {
     QString text =
-        editor->toPlainText().toLower();
+            editor->toPlainText().toLower();
 
     std::stringstream stream(
         text.toStdString()
@@ -788,30 +693,28 @@ void main_window::show_word_frequency()
 
     std::string word;
 
-    while (stream >> word)
-    {
+    while (stream >> word) {
         ++freq[word];
     }
 
-    auto* dialog =
-        new word_frequency_dialog(
-            freq,
-            this
-        );
+    auto *dialog =
+            new word_frequency_dialog(
+                freq,
+                this
+            );
 
     dialog->exec();
 }
 
-void main_window::update_status()
-{
+void main_window::update_status() {
     QTextCursor cursor =
-        editor->textCursor();
+            editor->textCursor();
 
     int line =
-        cursor.blockNumber() + 1;
+            cursor.blockNumber() + 1;
 
     int column =
-        cursor.columnNumber() + 1;
+            cursor.columnNumber() + 1;
 
     statusBar()->showMessage(
         QString(
@@ -820,4 +723,131 @@ void main_window::update_status()
         .arg(line)
         .arg(column)
     );
+}
+
+
+void main_window::open_file() {
+    QString file_name =
+            QFileDialog::getOpenFileName(
+                this,
+                "Open File"
+            );
+
+    if (file_name.isEmpty()) {
+        return;
+    }
+
+    try {
+        QFile file(file_name);
+
+        if (!file.exists()) {
+            throw file_not_found_exception(
+                file_name.toStdString()
+            );
+        }
+
+        if (!file.open(
+            QIODevice::ReadOnly |
+            QIODevice::Text
+        )) {
+            throw file_read_exception(
+                file_name.toStdString()
+            );
+        }
+
+        QTextStream in(&file);
+
+        QString contents =
+                in.readAll();
+
+        if (
+            in.status() !=
+            QTextStream::Ok
+        ) {
+            throw file_read_exception(
+                file_name.toStdString()
+            );
+        }
+
+        editor->setPlainText(
+            contents
+        );
+
+        current_file = file_name;
+
+        update_title();
+    } catch (
+        const notepad_exception &ex
+    ) {
+        QMessageBox::critical(
+            this,
+            "Error",
+            ex.what()
+        );
+    }
+}
+
+void main_window::save_file() {
+    QString file_name =
+            current_file;
+
+    if (file_name.isEmpty()) {
+        file_name =
+                QFileDialog::getSaveFileName(
+                    this,
+                    "Save File"
+                );
+    }
+
+    if (file_name.isEmpty()) {
+        return;
+    }
+
+    try {
+        QFile file(file_name);
+
+        if (!file.open(
+            QIODevice::WriteOnly |
+            QIODevice::Text
+        )) {
+            throw file_write_exception(
+                file_name.toStdString()
+            );
+        }
+
+        QTextStream out(&file);
+
+        out << editor->toPlainText();
+
+        current_file = file_name;
+
+        update_title();
+    } catch (
+        const notepad_exception &ex
+    ) {
+        QMessageBox::critical(
+            this,
+            "Error",
+            ex.what()
+        );
+    }
+}
+
+void main_window::save_file_as() {
+    current_file.clear();
+
+    save_file();
+}
+
+void main_window::update_title() {
+    if (current_file.isEmpty()) {
+        setWindowTitle(
+            "Notepad"
+        );
+    } else {
+        setWindowTitle(
+            "Notepad: " +
+            current_file
+        );
+    }
 }
